@@ -34,7 +34,7 @@ class AuthService
         $credentials = $request->only(['email', 'password']);
         if (!Auth::attempt($credentials))
             return response()->json([
-                'message' => 'Unauthorized'
+                'message' => trans('auth.unauthorized')
             ], 401);
         $user = Auth::user();
         $tokenResult = $user->createToken('Personal Access Token');
