@@ -16,3 +16,5 @@ docker-compose.yml
 .docker/mysql_test
 .docker/logs
 .docker/redis
+#ide files
+.idea/
