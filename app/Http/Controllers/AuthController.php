@@ -52,7 +52,7 @@ class AuthController extends Controller
     {
         $token = $this->authService->login($request);
 
-        return response()->json($token);
+        return response()->json($token['data'], $token['status']);
     }
 
     /**

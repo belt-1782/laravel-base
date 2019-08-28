@@ -27,15 +27,16 @@ class AuthService
 
     /**
      * @param LoginRequest $request
-     * @return user object
+     * @return array
      */
     public function login($request)
     {
         $credentials = $request->only(['email', 'password']);
         if (!Auth::attempt($credentials))
-            return response()->json([
-                'message' => trans('auth.unauthorized')
-            ], 401);
+            return [
+                'data' => ['message' => trans('auth.unauthorized')],
+                'status' => 401
+            ];
         $user = Auth::user();
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
@@ -45,11 +46,13 @@ class AuthService
         $token->save();
 
         return [
-            'access_token' => $tokenResult->accessToken,
-            'token_type' => 'Bearer',
-            'expires_at' => Carbon::parse(
-                $tokenResult->token->expires_at
-            )->toDateTimeString()
+            'data' => ['access_token' => $tokenResult->accessToken,
+                'token_type' => 'Bearer',
+                'expires_at' => Carbon::parse(
+                    $tokenResult->token->expires_at
+                )->toDateTimeString()
+            ],
+            'status' => 200
         ];
     }
 }

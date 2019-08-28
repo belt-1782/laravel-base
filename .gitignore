@@ -18,3 +18,4 @@ docker-compose.yml
 .docker/redis
 #ide files
 .idea/
+.env.testing
