@@ -36,82 +36,18 @@ class AuthControllerTest extends TestCase
     }
 
     /**
-     * Test require email invalid for signup function.
+     * Test validate sign up user.
      *
-     * @test
+     * @param $paramsInput
+     * @param $expectedResult
      *
-     * @return void
+     * @dataProvider providerTestSignupUser
      */
-    public function test_email_invalid_for_signup()
+    public function test_validate_for_signup($paramsInput, $expectedResult)
     {
-        $data = [
-            'name' => $this->faker->sentence,
-            'email' => 'example',
-            'password' => '123123',
-            'password_confirmation' => '123123',
-        ];
-
-        $response = $this->json('POST', '/api/auth/signup', $data);
+        $response = $this->json('POST', '/api/auth/signup', $paramsInput);
         $response->assertStatus(400)
-            ->assertJson([
-                'success' => false,
-                'error' => [
-                    "code"=> 622,
-                    "message" => "The email must be a valid email address.",
-                ]
-            ]);
-    }
-
-    /**
-     * Test require password for signup function.
-     *
-     * @test
-     *
-     * @return void
-     */
-    public function test_require_password_for_signup()
-    {
-        $data = [
-            'name' => $this->faker->sentence,
-            'email' => $this->faker->email,
-            'password_confirmation' => '123123',
-        ];
-
-        $response = $this->json('POST', '/api/auth/signup', $data);
-        $response->assertStatus(400)
-            ->assertJson([
-                'success' => false,
-                'error' => [
-                        "code"=> 622,
-                        "message" => "The password field is required.",
-                    ]
-            ]);
-    }
-
-    /**
-     * Test require name for signup function.
-     *
-     * @test
-     *
-     * @return void
-     */
-    public function test_require_name_for_signup()
-    {
-        $data = [
-            'email' => $this->faker->email,
-            'password' => '123123',
-            'password_confirmation' => '123123',
-        ];
-
-        $response = $this->json('POST', '/api/auth/signup', $data);
-        $response->assertStatus(400)
-            ->assertJson([
-                'success' => false,
-                'error' => [
-                    "code"=> 622,
-                    "message" => "The name field is required.",
-                ]
-            ]);
+            ->assertJson($expectedResult);
     }
 
     /**
@@ -161,48 +97,21 @@ class AuthControllerTest extends TestCase
     }
 
     /**
-     * Test require email for login function.
+     * Test validate login user.
      *
-     * @test
+     * @param $paramsInput
+     * @param $expectedResult
      *
-     * @return void
+     * @dataProvider providerTestLoginUser
      */
-    public function test_require_email_for_login()
+    public function test_validate_for_login($paramsInput, $expectedResult)
     {
-        $response = $this->json('POST', 'api/auth/login', [
-            'password' => '123456',
-        ]);
+        $response = $this->json('POST', 'api/auth/login', $paramsInput);
         $response->assertStatus(400)
-            ->assertJson([
-            'success' => false,
-            'error' => [
-                "code"=> 622,
-                "message" => "The email field is required.",
-            ]
-        ]);
+            ->assertJson($expectedResult);
     }
 
-    /**
-     * Test require password for login function.
-     *
-     * @test
-     *
-     * @return void
-     */
-    public function test_require_password_for_login()
-    {
-        $response = $this->json('POST', 'api/auth/login', [
-            'email' => 'example@gmail.com',
-        ]);
-        $response->assertStatus(400)
-            ->assertJson([
-                'success' => false,
-                'error' => [
-                    "code"=> 622,
-                    "message" => "The password field is required.",
-                ]
-            ]);
-    }
+
 
     /**
      * Test logout user success.
@@ -245,5 +154,98 @@ class AuthControllerTest extends TestCase
                     "message" => "Unauthorized, please check your credentials."
                 ]
             ]);
+    }
+
+    public function providerTestSignupUser()
+    {
+        return [
+            [
+                [
+                    'name' => 'example-name',
+                    'password' => '123123',
+                    'password_confirmation' => '123123',
+                ],
+                [
+                    'success' => false,
+                    'error' => [
+                        'code'=> 622,
+                        'message' => 'The email field is required.',
+                    ]
+                ]
+            ],
+            [
+
+                [
+                    'name' => 'example-name',
+                    'email' => 'example-email',
+                    'password' => '123123',
+                    'password_confirmation' => '123123',
+                ],
+                [
+                    'success' => false,
+                    'error' => [
+                        "code"=> 622,
+                        "message" => "The email must be a valid email address.",
+                    ]
+                ]
+            ],
+            [
+                [
+                    'name' => 'example-name',
+                    'email' => 'example@gmail.com',
+                ],
+                [
+                    'success' => false,
+                    'error' => [
+                        "code"=> 622,
+                        "message" => "The password field is required.",
+                    ]
+                ],
+            ],
+            [
+                [
+                    'email' => 'example@gmail.com',
+                    'password' => '123123',
+                    'password_confirmation' => '123123',
+                ],
+                [
+                    'success' => false,
+                    'error' => [
+                        "code"=> 622,
+                        "message" => "The name field is required.",
+                    ]
+                ]
+            ]
+
+        ];
+    }
+
+    public function providerTestLoginUser(){
+        return [
+            [
+                [
+                    'password' => '123456',
+                ],
+                [
+                    'success' => false,
+                    'error' => [
+                        "code"=> 622,
+                        "message" => "The email field is required.",
+                    ]
+                ]
+            ],
+            [
+                [
+                    'email' => 'example@gmail.com',
+                ],
+                [
+                    'success' => false,
+                    'error' => [
+                        "code"=> 622,
+                        "message" => "The password field is required.",
+                    ]
+                ]
+            ]
+        ];
     }
 }

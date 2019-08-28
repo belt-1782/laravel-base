@@ -32,17 +32,20 @@ class AuthService
     public function login($request)
     {
         $credentials = $request->only(['email', 'password']);
-        if (!Auth::attempt($credentials))
+        if (!Auth::attempt($credentials)) {
             return [
                 'data' => ['message' => trans('auth.unauthorized')],
                 'status' => 401
             ];
+        }
+
         $user = Auth::user();
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
 
-        if ($request->remember_me)
+        if ($request->remember_me) {
             $token->expires_at = Carbon::now()->addWeek(1);
+        }
         $token->save();
 
         return [

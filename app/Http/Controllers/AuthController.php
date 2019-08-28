@@ -27,8 +27,7 @@ class AuthController extends Controller
      * Create user
      *
      * @param  SignupRequest $request
-     * @return [string] message
-     * @return [json] user object
+     * @return JsonResponse
      */
     public function signup(SignupRequest $request)
     {
@@ -44,9 +43,7 @@ class AuthController extends Controller
      * Login user and create token
      *
      * @param  LoginRequest $request
-     * @return [string] access_token
-     * @return [string] token_type
-     * @return [string] expires_at
+     * @return JsonResponse
      */
     public function login(LoginRequest $request)
     {
@@ -58,7 +55,7 @@ class AuthController extends Controller
     /**
      * Logout user (Revoke the token)
      *
-     * @return [string] message
+     * @return JsonResponse
      */
     public function logout()
     {
@@ -72,7 +69,7 @@ class AuthController extends Controller
     /**
      * Get the authenticated User
      *
-     * @return [json] user object
+     * @return JsonResponse
      */
     public function user()
     {
