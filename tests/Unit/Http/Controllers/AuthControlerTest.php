@@ -111,8 +111,6 @@ class AuthControllerTest extends TestCase
             ->assertJson($expectedResult);
     }
 
-
-
     /**
      * Test logout user success.
      *
