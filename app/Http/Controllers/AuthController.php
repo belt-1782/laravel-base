@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\LaravelBaseApiException;
 use App\Services\AuthService;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\SignupRequest;
@@ -42,14 +43,15 @@ class AuthController extends Controller
     /**
      * Login user and create token
      *
-     * @param  LoginRequest $request
+     * @param LoginRequest $request
      * @return JsonResponse
+     * @throws LaravelBaseApiException
      */
     public function login(LoginRequest $request)
     {
         $token = $this->authService->login($request);
 
-        return response()->json($token['data'], $token['status']);
+        return response()->json($token);
     }
 
     /**

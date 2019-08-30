@@ -5,6 +5,7 @@ namespace App\Services;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Exceptions\LaravelBaseApiException;
 
 class AuthService
 {
@@ -28,15 +29,13 @@ class AuthService
     /**
      * @param LoginRequest $request
      * @return array
+     * @throws LaravelBaseApiException
      */
     public function login($request)
     {
         $credentials = $request->only(['email', 'password']);
         if (!Auth::attempt($credentials)) {
-            return [
-                'data' => ['message' => trans('auth.unauthorized')],
-                'status' => 401
-            ];
+            throw new LaravelBaseApiException('unauthorized');
         }
 
         $user = Auth::user();
@@ -49,13 +48,12 @@ class AuthService
         $token->save();
 
         return [
-            'data' => ['access_token' => $tokenResult->accessToken,
+            'access_token' => $tokenResult->accessToken,
                 'token_type' => 'Bearer',
                 'expires_at' => Carbon::parse(
                     $tokenResult->token->expires_at
-                )->toDateTimeString()
-            ],
-            'status' => 200
+                )->toDateTimeString(),
+            'user' => $user
         ];
     }
 }

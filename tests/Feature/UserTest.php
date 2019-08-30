@@ -14,7 +14,7 @@ class UserTest extends TestCase
      *
      * @return void
      */
-    public function test_contains_valid_fillable_properties()
+    public function contains_valid_fillable_properties()
     {
         $user = new User();
         $this->assertEquals(['name', 'email', 'password'], $user->getFillable());
@@ -27,7 +27,7 @@ class UserTest extends TestCase
      *
      * @return void
      */
-    public function test_contains_valid_hidden_properties()
+    public function contains_valid_hidden_properties()
     {
         $user = new User();
         $this->assertEquals(['password', 'remember_token'], $user->getHidden());
@@ -40,7 +40,7 @@ class UserTest extends TestCase
      *
      * @return void
      */
-    public function test_contains_valid_cast_properties()
+    public function contains_valid_cast_properties()
     {
         $user = new User();
         $this->assertEquals(['id' => 'int', 'email_verified_at' => 'datetime'], $user->getCasts());

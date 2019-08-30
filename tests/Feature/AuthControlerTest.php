@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\Http\Controllers;
 
+use App\Exceptions\LaravelBaseApiException;
 use App\User;
+use Illuminate\Auth\AuthenticationException;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -18,7 +20,7 @@ class AuthControllerTest extends TestCase
      *
      * @return void
      */
-    public function test_signup_success()
+    public function signup_success()
     {
         $data = [
             'name' => $this->faker->name,
@@ -26,12 +28,18 @@ class AuthControllerTest extends TestCase
             'password' => '123123',
             'password_confirmation' => '123123',
         ];
-
         $response = $this->json('POST', '/api/auth/signup', $data);
+        $user = User::latest()->first();
         $response->assertStatus(201)
-                 ->assertJsonStructure([
-                     'message',
-                     'user'
+                 ->assertJson([
+                     'message' => 'Successfully created user!',
+                     'user' => [
+                         'name' => $data['name'],
+                         'email' => $data['email'],
+                         'updated_at' => $user->updated_at,
+                         'created_at' => $user->created_at,
+                         'id' => $user->id
+                    ]
                  ]);
     }
 
@@ -43,7 +51,7 @@ class AuthControllerTest extends TestCase
      *
      * @dataProvider providerTestSignupUser
      */
-    public function test_validate_for_signup($paramsInput, $expectedResult)
+    public function validate_for_signup($paramsInput, $expectedResult)
     {
         $response = $this->json('POST', '/api/auth/signup', $paramsInput);
         $response->assertStatus(400)
@@ -57,7 +65,7 @@ class AuthControllerTest extends TestCase
      *
      * @return void
      */
-    public function test_login_success()
+    public function login_success()
     {
         $user = factory(User::class)->create([
             'name' => $this->faker->name,
@@ -81,18 +89,23 @@ class AuthControllerTest extends TestCase
      * Test login user fail.
      *
      * @test
-     *
+     * @expectedException App\Exceptions\LaravelBaseApiException
      * @return void
      */
-    public function test_login_fail()
+    public function login_fail()
     {
+        $this->withoutExceptionHandling();
+
         $response = $this->json('POST', 'api/auth/login', [
             'email' => 'example@gmail.com',
             'password' => '123456',
-        ]);
-        $response->assertStatus(401)
+        ])->assertStatus(400)
             ->assertJson([
-                 'message' => 'Unauthorized'
+                    'success' => false,
+                    'error' => [
+                        'code' => '601',
+                        'message' => 'Unauthorized, please check your credentials.'
+                    ]
             ]);
     }
 
@@ -104,7 +117,7 @@ class AuthControllerTest extends TestCase
      *
      * @dataProvider providerTestLoginUser
      */
-    public function test_validate_for_login($paramsInput, $expectedResult)
+    public function validate_for_login($paramsInput, $expectedResult)
     {
         $response = $this->json('POST', 'api/auth/login', $paramsInput);
         $response->assertStatus(400)
@@ -118,7 +131,7 @@ class AuthControllerTest extends TestCase
      *
      * @return void
      */
-    public function test_logout_success()
+    public function logout_success()
     {
         $user = factory(User::class)->create([
             'name' => $this->faker->name,
@@ -130,7 +143,7 @@ class AuthControllerTest extends TestCase
         $response = $this->json('GET', '/api/auth/logout', [], ['Authorization' => 'Bearer ' . $token]);
         $response->assertStatus(200)
             ->assertJson([
-                "message" => "Successfully logged out",
+                'message' => 'Successfully logged out',
             ]);
     }
 
@@ -141,15 +154,15 @@ class AuthControllerTest extends TestCase
      *
      * @return void
      */
-    public function test_logout_fail()
+    public function logout_fail()
     {
-        $response = $this->json('GET', '/api/auth/logout', [], ['Authorization' => 'Bearer ' . "1234567"]);
+        $response = $this->json('GET', '/api/auth/logout', [], ['Authorization' => 'Bearer ' . '1234567']);
         $response->assertStatus(400)
             ->assertJson([
-                "success" => false,
-                "error" => [
-                    "code" => 601,
-                    "message" => "Unauthorized, please check your credentials."
+                'success' => false,
+                'error' => [
+                    'code' => 601,
+                    'message' => 'Unauthorized, please check your credentials.'
                 ]
             ]);
     }
@@ -182,8 +195,8 @@ class AuthControllerTest extends TestCase
                 [
                     'success' => false,
                     'error' => [
-                        "code"=> 622,
-                        "message" => "The email must be a valid email address.",
+                        'code'=> 622,
+                        'message' => 'The email must be a valid email address.',
                     ]
                 ]
             ],
@@ -195,8 +208,8 @@ class AuthControllerTest extends TestCase
                 [
                     'success' => false,
                     'error' => [
-                        "code"=> 622,
-                        "message" => "The password field is required.",
+                        'code'=> 622,
+                        'message' => 'The password field is required.',
                     ]
                 ],
             ],
@@ -209,8 +222,8 @@ class AuthControllerTest extends TestCase
                 [
                     'success' => false,
                     'error' => [
-                        "code"=> 622,
-                        "message" => "The name field is required.",
+                        'code'=> 622,
+                        'message' => 'The name field is required.',
                     ]
                 ]
             ]
@@ -227,8 +240,8 @@ class AuthControllerTest extends TestCase
                 [
                     'success' => false,
                     'error' => [
-                        "code"=> 622,
-                        "message" => "The email field is required.",
+                        'code'=> 622,
+                        'message' => 'The email field is required.',
                     ]
                 ]
             ],
@@ -239,8 +252,8 @@ class AuthControllerTest extends TestCase
                 [
                     'success' => false,
                     'error' => [
-                        "code"=> 622,
-                        "message" => "The password field is required.",
+                        'code'=> 622,
+                        'message' => 'The password field is required.',
                     ]
                 ]
             ]
