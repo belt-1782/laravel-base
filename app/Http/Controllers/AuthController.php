@@ -50,7 +50,6 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $token = $this->authService->login($request);
-
         return response()->json($token);
     }
 
@@ -61,20 +60,10 @@ class AuthController extends Controller
      */
     public function logout()
     {
-         Auth::user()->token()->revoke();
+        Auth::user()->token()->revoke();
 
-         return response()->json([
+        return response()->json([
             'message' => trans('auth.successfully_logged_out')
-         ]);
-    }
-
-    /**
-     * Get the authenticated User
-     *
-     * @return JsonResponse
-     */
-    public function user()
-    {
-        return response()->json(Auth::user());
+        ]);
     }
 }

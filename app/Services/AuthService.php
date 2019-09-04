@@ -39,9 +39,9 @@ class AuthService
         }
 
         $user = Auth::user();
+
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
-
         if ($request->remember_me) {
             $token->expires_at = Carbon::now()->addWeek(1);
         }

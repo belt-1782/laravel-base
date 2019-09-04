@@ -19,3 +19,4 @@ docker-compose.yml
 #ide files
 .idea/
 .env.testing
+/coverage
