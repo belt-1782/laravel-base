@@ -23,7 +23,7 @@ class AuthService
 
         $data['password'] = bcrypt($data['password']);
 
-        return User::create($data);
+        return User::create($data)->assignRole('member');
     }
 
     /**

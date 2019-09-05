@@ -71,11 +71,10 @@ class UserPolicy
      * Determine whether the user can delete the model.
      *
      * @param \App\User $user
-     * @param \App\User $member
      *
      * @return mixed
      */
-    public function delete(User $user, Member $member)
+    public function delete(User $user)
     {
         return  $user->can('user-delete');
     }

@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use App\Exceptions\LaravelBaseApiException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -36,6 +37,9 @@ trait RestExceptionHandlerTrait
                 break;
             case $this->isLaravelBaseApiException($e):
                 $retval = $this->handleLaravelBaseApiException($e);
+                break;
+            case $this->isAuthorizationException($e):
+                $retval = $this->authorization();
                 break;
             default:
                 $retval = $this->badRequest();
@@ -93,6 +97,19 @@ trait RestExceptionHandlerTrait
         return $this->jsonResponse([
             'code' => config('api_exception.method_not_found.error_code'),
             'message' => config('api_exception.method_not_found.message'),
+        ]);
+    }
+
+    /**
+     * Returns json response for method authorization exception.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function authorization()
+    {
+        return $this->jsonResponse([
+            'code' => config('api_exception.fail_authorization.error_code'),
+            'message' => config('api_exception.fail_authorization.message'),
         ]);
     }
 
@@ -169,5 +186,16 @@ trait RestExceptionHandlerTrait
     protected function isLaravelBaseApiException(Exception $e)
     {
         return $e instanceof LaravelBaseApiException;
+    }
+
+    /**
+     * Determines if the given exception is AuthorizationException.
+     *
+     * @param Exception $e
+     * @return bool
+     */
+    protected function isAuthorizationException(Exception $e)
+    {
+        return $e instanceof AuthorizationException;
     }
 }
