@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\LaravelBaseApiException;
+use App\Jobs\RegistedUser;
 use App\Services\AuthService;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\SignupRequest;
 use Illuminate\Support\Facades\Auth;
+use App\Exceptions\LaravelBaseApiException;
 
 class AuthController extends Controller
 {
@@ -33,6 +34,7 @@ class AuthController extends Controller
     public function signup(SignupRequest $request)
     {
         $user = $this->authService->createUser($request);
+        RegistedUser::dispatch($user);
 
         return response()->json([
             'message' => trans('auth.successfully_created_user'),
