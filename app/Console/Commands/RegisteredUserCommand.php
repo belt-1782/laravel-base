@@ -2,7 +2,8 @@
 
 namespace App\Console\Commands;
 
-use DB;
+use App\User;
+use Carbon\Carbon;
 use App\Mail\CountUserMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Console\Command;
@@ -40,8 +41,7 @@ class RegisteredUserCommand extends Command
      */
     public function handle()
     {
-        $totalUsers = \DB::table('users')
-            ->whereRaw('Date(created_at) = CURDATE()')
+        $totalUsers = User::whereDate('created_at', Carbon::today())
             ->count();
         Mail::to('le.thi.be@sun-asterisk.com')->send(new CountUserMail($totalUsers));
     }
