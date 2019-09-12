@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Http\Requests\SignupRequest;
 use Illuminate\Support\Facades\Auth;
@@ -29,10 +30,10 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('index', User::class);
-        $users = $this->userService->getListUser();
+        $users = $this->userService->getListUser($request);
 
         return response()->json($users);
     }
@@ -61,6 +62,7 @@ class UserController extends Controller
     {
         $this->authorize('create', User::class);
         $user = $this->userService->createUser($request);
+        $user->addToIndex();
 
         return response()->json([
             'message' => trans('auth.successfully_created_user'),
@@ -80,6 +82,7 @@ class UserController extends Controller
         $currentUser = Auth::user();
         $this->authorize('update', $currentUser, $user);
         $response = $this->userService->updateUser($user, $request);
+        $user->updateIndex();
 
         return response()->json([
             'success' => $response,
@@ -96,6 +99,7 @@ class UserController extends Controller
     {
         $this->authorize('delete', User::class);
         $response = $this->userService->deleteUser($user);
+        $user->removeFromIndex();
 
         return response()->json([
             'success' => $response,

@@ -14,9 +14,27 @@ class UserService
      *
      * @return object
      */
-    public function getListUser()
+    public function getListUser($request)
     {
-        return User::all();
+        if($request->has('search')){
+            return User::complexSearch(array(
+                'body' => array(
+                    'query' => array(
+                        'multi_match' => array(
+                            "query" => $request->input('search'),
+                            "operator" => "and",
+                            "type" => "cross_fields",
+                            "fields" => [
+                                "name",
+                                "email"
+                            ]
+                        )
+                    )
+                )
+            ));
+        } else {
+            return User::all();
+        }
     }
 
     /**
